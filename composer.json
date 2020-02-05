@@ -1,0 +1,25 @@
+{
+    "name": "brianhenryie/composer-phpstorm",
+    "description": "Composer script to exclude folders from PhpStorm code navigation.",
+    "keywords": ["composer", "phpstorm", "excludefolder"],
+    "homepage": "https://github.com/BrianHenryIE/composer-phpstorm",
+    "license": "MIT",
+    "authors": [
+        { "name": "Brian Henry", "email": "BrianHenryIE@gmail.com" }
+    ],
+    "require": {
+        "symfony/filesystem": "^2.5 || ^3.0"
+    },
+    "require-dev": {
+        "composer/composer": "^1.0@dev",
+        "phpunit/phpunit": "^8",
+        "squizlabs/php_codesniffer": "*"
+    },
+    "autoload": {
+        "psr-4": {"BrianHenryIE\\ComposerPhpStorm\\": "src/"},
+        "exclude-from-classmap": ["/tests/"]
+    },
+    "autoload-dev": {
+        "psr-4": { "BrianHenryIE\\ComposerPhpStorm\\Tests\\": "tests/" }
+    }
+}
