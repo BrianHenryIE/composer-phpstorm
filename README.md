@@ -45,10 +45,11 @@ Optionally:
 "extra": {
  "phpstorm": {
   "exclude_folders": {
-  	"folders": {
+  	"folders": [
      "path/to/folder_one/from/project/base",
      "path/to/folder_two/from/project/base"    
-   }
+   ],
+   'composer-symlinks': false
   }
  }
 }
@@ -61,9 +62,9 @@ Optionally:
 
 Folders to exclude can be specified under `extras/phpstorm/exclude_folders/folders`. These are assumed to be relative from the project root. 
 
-The Composer tool, [coenjacobs/mozart](https://github.com/coenjacobs/mozart), for prefixing package namespaces results in each class being copied, thus each classname::function having multiple implementations from PhpStorm's point of view. This tool reads the Mozart Composer configuration and excludes source folders of packages managed by Mozart.
+The Composer tool [coenjacobs/mozart](https://github.com/coenjacobs/mozart), for prefixing package namespaces, results in each class being copied, thus each classname::function having multiple implementations in PhpStorm's code completion. This tool reads the Mozart Composer configuration and excludes source folders of packages managed by Mozart.
 
-The source of symlinks created by [kporras07/composer-symlinks](https://github.com/kporras07/composer-symlinks) are exculded if in the project directory.
+The source of symlinks created by [kporras07/composer-symlinks](https://github.com/kporras07/composer-symlinks) are excluded if in the project directory. This can be disabled by setting `extras/phpstorm/exclude_folders/folders` to `false` in your `composer.json`.
 
 Inside `/.idea/project-name.iml`'s `<component name="NewModuleRootManager"> <content url="file://$MODULE_DIR$">` adds:
  
@@ -92,6 +93,11 @@ WordPress. [I write many small plugins](https://github.com/BrianHenryIE/WordPres
 
 * Symlinks could searched for, then checked if they were pointing inside the project directory, rather than reading from composer.json
 * Set Default Interpreter (PHP Language Level/CLI Interpreter)
+* Configuration to allow excluding autodiscovered `phpunit.xml`s
+* Should find subpackages of those processed by Mozart 
+* Set PHP language level
+* Set PHPCS, CBF, WordPress path
+* Allow disabling Mozart integration
 
 ## Acknowledgements
 

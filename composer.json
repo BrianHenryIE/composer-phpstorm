@@ -21,5 +21,13 @@
     },
     "autoload-dev": {
         "psr-4": { "BrianHenryIE\\ComposerPhpStorm\\Tests\\": "tests/" }
+    },
+    "scripts": {
+        "post-install-cmd": [
+            "BrianHenryIE\\ComposerPhpStorm\\PHPUnitRunConfigurations::update"
+        ],
+        "post-update-cmd": [
+            "BrianHenryIE\\ComposerPhpStorm\\PHPUnitRunConfigurations::update"
+        ]
     }
 }
