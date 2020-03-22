@@ -65,9 +65,11 @@ Optionally:
 
 Folders to exclude can be specified under `extras/phpstorm/exclude_folders/folders`. These are assumed to be relative from the project root. 
 
+PhpStorm automatically adds project folders inside the vendor folder to its excluded folders list, so adding them to the `folders` list doesn't achieve the desired effect. Instead, the `vendor/vendor-name/project/src` folder should be added to the `exculde_folders/folders` list and, counter-intuitively, `vendor/vendor-name/project/src` should be added to the `exculde_folders/include_folders` list.
+
 The Composer tool [coenjacobs/mozart](https://github.com/coenjacobs/mozart), for prefixing package namespaces, results in each class being copied, thus each classname::function having multiple implementations in PhpStorm's code completion. This tool reads the Mozart Composer configuration and excludes source folders of packages managed by Mozart.
 
-The source of symlinks created by [kporras07/composer-symlinks](https://github.com/kporras07/composer-symlinks) are excluded if in the project directory. This can be disabled by setting `extras/phpstorm/exclude_folders/folders` to `false` in your `composer.json`.
+The file source of symlinks created by [kporras07/composer-symlinks](https://github.com/kporras07/composer-symlinks) are excluded if in the project directory. This can be disabled by setting `extras/phpstorm/exclude_folders/folders` to `false` in your `composer.json`. The file souce of a symlink is not excluded if it is in the root of the project.
 
 Inside `/.idea/project-name.iml`'s `<component name="NewModuleRootManager"> <content url="file://$MODULE_DIR$">` adds:
  
@@ -101,6 +103,8 @@ WordPress. [I write many small plugins](https://github.com/BrianHenryIE/WordPres
 * Set PHP language level
 * Set PHPCS, CBF, WordPress path
 * Allow disabling Mozart integration
+* Automatically handle `vendor-name/project` folders in exclusion list but including that folder and excluding their `src` folder.
+* Should be one script and conditionally run parts based on config.
 
 ## Acknowledgements
 
