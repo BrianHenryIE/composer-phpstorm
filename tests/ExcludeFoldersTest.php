@@ -571,9 +571,6 @@ class ExcludeFoldersTest extends TestCase
                 "wp-content/plugins" => "wordpress/wp-content/plugins"
             ]
         ]);
-        $fileToWrite = getcwd() . '/tests/ExcludeFolders/DisableComposerSymlinks/.idea/valid.iml';
-        $expectedFileOutput = file_get_contents(getcwd()
-                                                . '/tests/ExcludeFolders/DisableComposerSymlinks/expected.iml');
 
         $this->filesystem->expects($this->never())
                          ->method('dumpFile');
