@@ -46,8 +46,11 @@ Optionally:
  "phpstorm": {
   "exclude_folders": {
   	"folders": [
-     "path/to/folder_one/from/project/base",
-     "path/to/folder_two/from/project/base"    
+   		"path/to/folder_one/from/project/base",
+  		"path/to/folder_two/from/project/base"    
+   ],
+   "include_folders": [
+  		"path/to/folder_one/from/project/base",
    ],
    'composer-symlinks': false
   }

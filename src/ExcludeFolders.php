@@ -17,6 +17,14 @@ class ExcludeFolders
         /** @var Config $config */
         $config = $event->getComposer()->getConfig();
 
+        $foldersToInclude = array();
+        if (isset($package->getExtra()['phpstorm']['exclude_folders']['include_folders'])) {
+            foreach ($package->getExtra()['phpstorm']['exclude_folders']['include_folders'] as $folderToInclude) {
+                $folderToInclude = ltrim($folderToInclude, '.');
+                $folderToInclude = trim($folderToInclude, '/');
+                $foldersToInclude[] = $folderToInclude;
+            }
+        }
         $foldersToExclude = array();
         if (
             array_key_exists('phpstorm', $package->getExtra())
@@ -26,10 +34,18 @@ class ExcludeFolders
             foreach ($package->getExtra()['phpstorm']['exclude_folders']['folders'] as $folderToExclude) {
                 $folderToExclude = ltrim($folderToExclude, '.');
                 $folderToExclude = trim($folderToExclude, '/');
-                $foldersToExclude[] = $folderToExclude;
+
+                if (!in_array($folderToExclude, $foldersToInclude)) {
+                    $foldersToExclude[] = $folderToExclude;
+                } else {
+                    $event->getIO()->write(sprintf(
+                        '<error>Folder "%s" in both include and exclude list.</error>',
+                        $folderToExclude
+                    ));
+                }
             }
         }
-        
+
         $vendorPath = $config->get('vendor-dir');
         $rootPath = dirname($vendorPath);
         $filesystem = $filesystem ?: new Filesystem();
@@ -130,9 +146,13 @@ class ExcludeFolders
 
                 // If the folder suggested to exclude is a root folder, swap the entries.
                 if (strpos($fileLocation, '/') === false) {
-                    $foldersToExclude[] = $symlinkLocation;
+                    if (!in_array($symlinkLocation, $foldersToInclude)) {
+                        $foldersToExclude[] = $symlinkLocation;
+                    }
                 } else {
-                    $foldersToExclude[] = $fileLocation;
+                    if (!in_array($fileLocation, $foldersToInclude)) {
+                        $foldersToExclude[] = $fileLocation;
+                    }
                 }
             }
         }
@@ -152,7 +172,6 @@ class ExcludeFolders
                 }
             }
         }
-
 
         foreach ($foldersToExclude as $folderToExclude) {
             // Sanitize folder path.
@@ -203,6 +222,25 @@ class ExcludeFolders
                     $folderToExclude,
                     $phpStormProjectConfig
                 ));
+            }
+        }
+
+        foreach ($foldersToInclude as $folderToInclude) {
+            $newNodeUrl = "file://\$MODULE_DIR$/$folderToInclude";
+
+            foreach ($content->childNodes as $node) {
+
+                /** @var \DOMNode $node */
+
+                if ($node->nodeName == 'excludeFolder' && $node->getAttribute('url') === $newNodeUrl) {
+                    $node->parentNode->removeChild($node);
+                    $event->getIO()->write(sprintf(
+                        '<info>PhpStorm config exclusion removed for "%s".</info>',
+                        $folderToInclude
+                    ));
+                    $domWasModified = true;
+                    break;
+                }
             }
         }
 

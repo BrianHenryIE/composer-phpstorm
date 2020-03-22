@@ -580,4 +580,44 @@ class ExcludeFoldersTest extends TestCase
 
         ExcludeFolders::update($this->event, $this->filesystem);
     }
+
+    /**
+     * After all other operations, make sure these folders aren't still excluded.
+     */
+    public function testIncludeFolder()
+    {
+
+        $this->composer->setConfig(new Config(false, __DIR__ . '/ExcludeFolders/IncludeFolder'));
+
+        $expected = array();
+        $expected[] = '<info>PhpStorm config already excludes "foldertoexclude".</info>';
+        $expected[] = '<info>PhpStorm config exclusion removed for "foldertoinclude".</info>';
+
+        $this->io
+            ->expects($this->exactly(2))
+            ->method('write')
+            ->withConsecutive(
+                [$expected[0]],
+                [$expected[1]]
+            );
+
+        $this->package->setExtra([
+            "phpstorm" => [
+                "exclude_folders" => [
+                    "folders" => [ "foldertoexclude" ],
+                    "include_folders" => [ "foldertoinclude" ]
+                ],
+            ]
+        ]);
+
+        $fileToWrite = getcwd() . '/tests/ExcludeFolders/IncludeFolder/.idea/valid.iml';
+        $expectedFileOutput = file_get_contents(getcwd() . '/tests/ExcludeFolders/IncludeFolder/expected.iml');
+
+        $this->filesystem->expects($this->once())
+                         ->method('dumpFile')
+                         ->with($fileToWrite, $expectedFileOutput);
+
+        ExcludeFolders::update($this->event, $this->filesystem);
+    }
+
 }
