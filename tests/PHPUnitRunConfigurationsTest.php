@@ -77,7 +77,8 @@ class PHPUnitRunConfigurationsTest extends TestCase
             );
 
         $fileToWrite = getcwd() . '/tests/PHPUnitRunConfigurations/InProjectRoot/.idea/workspace.xml';
-        $expectedFileOutput = file_get_contents(getcwd() . '/tests/PHPUnitRunConfigurations/InProjectRoot/expected-workspace.xml');
+        $expectedFileOutput = file_get_contents(getcwd() . '/tests/PHPUnitRunConfigurations/'
+                                                . 'InProjectRoot/expected-workspace.xml');
 
         $this->filesystem->expects($this->once())
             ->method('dumpFile')
@@ -90,8 +91,10 @@ class PHPUnitRunConfigurationsTest extends TestCase
     {
         $this->composer->setConfig(new Config(false, __DIR__ . '/PHPUnitRunConfigurations/InProjectSubfolder'));
 
-        $expectedTerminalOutput = '<info>Added PHPStorm Run Configuration "wordpress-develop" for `/tests/wordpress-develop/phpunit.xml` to "'
-            . getcwd() . '/tests/PHPUnitRunConfigurations/InProjectSubfolder/.idea/workspace.xml".</info>';
+        $expectedTerminalOutput = '<info>Added PHPStorm Run Configuration "wordpress-develop" for '
+                                  . '`/tests/wordpress-develop/phpunit.xml` to "'
+                                  . getcwd()
+                                  . '/tests/PHPUnitRunConfigurations/InProjectSubfolder/.idea/workspace.xml".</info>';
 
         $this->io
             ->expects($this->exactly(1))
@@ -101,7 +104,9 @@ class PHPUnitRunConfigurationsTest extends TestCase
             );
 
         $fileToWrite = getcwd() . '/tests/PHPUnitRunConfigurations/InProjectSubfolder/.idea/workspace.xml';
-        $expectedFileOutput = file_get_contents(getcwd() . '/tests/PHPUnitRunConfigurations/InProjectSubfolder/expected-workspace.xml');
+        $expectedFileOutput = file_get_contents(getcwd()
+                                                . '/tests/PHPUnitRunConfigurations/'
+                                                . 'InProjectSubfolder/expected-workspace.xml');
 
         $this->filesystem->expects($this->once())
             ->method('dumpFile')
@@ -117,8 +122,10 @@ class PHPUnitRunConfigurationsTest extends TestCase
     {
         $this->composer->setConfig(new Config(false, __DIR__ . '/PHPUnitRunConfigurations/MissingFromFilesystem'));
 
-        $expectedTerminalOutput = '<info>Removed PHPUnit Run Configuration "wordpress-develop" at `$PROJECT_DIR$/tests/wordpress-develop/phpunit.xml` from "'
-            . getcwd() . '/tests/PHPUnitRunConfigurations/MissingFromFilesystem/.idea/workspace.xml".</info>';
+        $expectedTerminalOutput = '<info>Removed PHPUnit Run Configuration "wordpress-develop" at '
+                                  . '`$PROJECT_DIR$/tests/wordpress-develop/phpunit.xml` from "' . getcwd()
+                                  . '/tests/PHPUnitRunConfigurations/MissingFromFilesystem/.idea/workspace.xml".'
+                                  . '</info>';
 
         $this->io
             ->expects($this->exactly(1))
@@ -128,7 +135,9 @@ class PHPUnitRunConfigurationsTest extends TestCase
             );
 
         $fileToWrite = getcwd() . '/tests/PHPUnitRunConfigurations/MissingFromFilesystem/.idea/workspace.xml';
-        $expectedFileOutput = file_get_contents(getcwd() . '/tests/PHPUnitRunConfigurations/MissingFromFilesystem/expected-workspace.xml');
+        $expectedFileOutput = file_get_contents(getcwd()
+                                                . '/tests/PHPUnitRunConfigurations/'
+                                                . 'MissingFromFilesystem/expected-workspace.xml');
 
         $this->filesystem->expects($this->once())
             ->method('dumpFile')
@@ -144,8 +153,10 @@ class PHPUnitRunConfigurationsTest extends TestCase
     {
         $this->composer->setConfig(new Config(false, __DIR__ . '/PHPUnitRunConfigurations/AlreadyPresent'));
 
-        $expectedTerminalOutput = '<info>PhpStorm PHPUnit Run Configuration "wordpress-develop" for "/tests/wordpress-develop/phpunit.xml" already present in "'
-            . getcwd() . '/tests/PHPUnitRunConfigurations/AlreadyPresent/.idea/workspace.xml".</info>';
+        $expectedTerminalOutput = '<info>PhpStorm PHPUnit Run Configuration "wordpress-develop" for '
+                                  . '"/tests/wordpress-develop/phpunit.xml" already present in "'
+                                  . getcwd()
+                                  . '/tests/PHPUnitRunConfigurations/AlreadyPresent/.idea/workspace.xml".</info>';
 
         $this->io
             ->expects($this->exactly(1))
@@ -184,7 +195,8 @@ class PHPUnitRunConfigurationsTest extends TestCase
      *
      * The IgnoreVendorFolder has a phpunit.xml in a vendor subfolder.
      */
-    public function testIgnoreVendorFolder() {
+    public function testIgnoreVendorFolder()
+    {
 
         $this->composer->setConfig(new Config(false, __DIR__ . '/PHPUnitRunConfigurations/IgnoreVendorFolder'));
 
@@ -199,7 +211,9 @@ class PHPUnitRunConfigurationsTest extends TestCase
             );
 
         $fileToWrite = getcwd() . '/tests/PHPUnitRunConfigurations/IgnoreVendorFolder/.idea/workspace.xml';
-        $expectedFileOutput = file_get_contents(getcwd() . '/tests/PHPUnitRunConfigurations/IgnoreVendorFolder/expected-workspace.xml');
+        $expectedFileOutput = file_get_contents(getcwd()
+                                                . '/tests/PHPUnitRunConfigurations/'
+                                                . 'IgnoreVendorFolder/expected-workspace.xml');
 
         $this->filesystem->expects($this->once())
             ->method('dumpFile')
@@ -214,7 +228,8 @@ class PHPUnitRunConfigurationsTest extends TestCase
      *
      * The IgnoreVendorFolder has a phpunit.xml in a vendor subfolder.
      */
-    public function testIgnoreWpContentFolder() {
+    public function testIgnoreWpContentFolder()
+    {
 
         $this->composer->setConfig(new Config(false, __DIR__ . '/PHPUnitRunConfigurations/IgnoreWpContentFolder'));
 
@@ -229,7 +244,8 @@ class PHPUnitRunConfigurationsTest extends TestCase
             );
 
         $fileToWrite = getcwd() . '/tests/PHPUnitRunConfigurations/IgnoreWpContentFolder/.idea/workspace.xml';
-        $expectedFileOutput = file_get_contents(getcwd() . '/tests/PHPUnitRunConfigurations/IgnoreWpContentFolder/expected-workspace.xml');
+        $expectedFileOutput = file_get_contents(getcwd() . '/tests/PHPUnitRunConfigurations/'
+                                                . 'IgnoreWpContentFolder/expected-workspace.xml');
 
         $this->filesystem->expects($this->once())
             ->method('dumpFile')

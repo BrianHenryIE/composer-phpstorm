@@ -17,7 +17,8 @@ workspace.xml
 <project version="4">
   <component name="RunManager" selected="PHPUnit.phpunit.xml">
     <configuration name="wordpress-develop" type="PHPUnitRunConfigurationType" factoryName="PHPUnit">
-      <TestRunner configuration_file="$PROJECT_DIR$/tests/wordpress-develop/phpunit.xml" scope="XML" use_alternative_configuration_file="true" />
+      <TestRunner configuration_file="$PROJECT_DIR$/tests/wordpress-develop/phpunit.xml"
+        scope="XML" use_alternative_configuration_file="true" />
       <method v="2" />
     </configuration>
 
@@ -154,12 +155,12 @@ class PHPUnitRunConfigurations
             $phpUnitFileRegistered = false;
 
             // Ignore vendor subfolder.
-            if(  preg_match('/^\$PROJECT_DIR\$\/vendor/', $phpUnitFile ) ) {
+            if (preg_match('/^\$PROJECT_DIR\$\/vendor/', $phpUnitFile)) {
                 continue;
             }
 
             // Ignore wp-content subfolder.
-            if(  preg_match('/^\$PROJECT_DIR\$\/wp-content/', $phpUnitFile ) ) {
+            if (preg_match('/^\$PROJECT_DIR\$\/wp-content/', $phpUnitFile)) {
                 continue;
             }
 
@@ -169,7 +170,10 @@ class PHPUnitRunConfigurations
                 /** @var \DOMNode $node */
 
                 // Check all child nodes for node of type <configuration type="PHPUnitRunConfigurationType">
-                if ($node->nodeName == 'configuration' && $node->getAttribute('type') === "PHPUnitRunConfigurationType") {
+                if (
+                    $node->nodeName == 'configuration'
+                    && $node->getAttribute('type') === "PHPUnitRunConfigurationType"
+                ) {
                     foreach ($node->childNodes as $grandchildNode) {
                         if ($grandchildNode->nodeName == 'TestRunner') {
                             if ($grandchildNode->getAttribute('configuration_file') === $phpUnitFile) {
@@ -183,7 +187,8 @@ class PHPUnitRunConfigurations
             }
 
 
-            $configurationName = '$PROJECT_DIR$' === dirname($phpUnitFile) ? 'PHPUnit' : basename(dirname($phpUnitFile));
+            $configurationName = '$PROJECT_DIR$' === dirname($phpUnitFile)
+                ? 'PHPUnit' : basename(dirname($phpUnitFile));
 
             if ($phpUnitFileRegistered) {
                 $event->getIO()->write(sprintf(
