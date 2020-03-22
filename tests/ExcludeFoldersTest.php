@@ -500,4 +500,84 @@ class ExcludeFoldersTest extends TestCase
 
         ExcludeFolders::update($this->event, $this->filesystem);
     }
+
+    /**
+     * When a symlink is already explicitly excluded, don't exclude the file source of that symlink.
+     */
+    public function testSkipAlreadyExcludedSymlinks()
+    {
+
+        $this->composer->setConfig(new Config(false, __DIR__ . '/ExcludeFolders/SkipAlreadyExcludedSymlinks'));
+
+        $expectedTerminalOutput = array();
+
+        $expectedTerminalOutput[] = '<info>Skipping excluding "wp-content/plugins" because symlink '
+                                    . '"wordpress/wp-content/plugins" is already excluded.</info>';
+        $expectedTerminalOutput[] = '<info>Added "wordpress/wp-content/plugins" to PhpStorm config at "'
+                                    . getcwd()
+                                    . '/tests/ExcludeFolders/SkipAlreadyExcludedSymlinks/.idea/valid.iml".</info>';
+
+        $this->io
+            ->expects($this->exactly(2))
+            ->method('write')
+            ->withConsecutive(
+                [$expectedTerminalOutput[0]],
+                [$expectedTerminalOutput[1]]
+            );
+
+        $this->package->setExtra([
+            "phpstorm" => [
+                "exclude_folders" => [
+                    "folders" => [
+                        "wordpress/wp-content/plugins"
+                    ]
+                ]
+            ],
+            "symlinks" => [
+                "wp-content/plugins" => "wordpress/wp-content/plugins"
+            ]
+        ]);
+
+        $fileToWrite = getcwd() . '/tests/ExcludeFolders/SkipAlreadyExcludedSymlinks/.idea/valid.iml';
+        $expectedFileOutput = file_get_contents(getcwd()
+                                                . '/tests/ExcludeFolders/SkipAlreadyExcludedSymlinks/expected.iml');
+
+        $this->filesystem->expects($this->once())
+                         ->method('dumpFile')
+                         ->with($fileToWrite, $expectedFileOutput);
+
+        ExcludeFolders::update($this->event, $this->filesystem);
+    }
+
+    /**
+     * Allow disabling processing of symlinks.
+     */
+    public function testDisableComposerSymlinks()
+    {
+
+        $this->composer->setConfig(new Config(false, __DIR__ . '/ExcludeFolders/DisableComposerSymlinks'));
+
+        $this->io
+            ->expects($this->never())
+            ->method('write');
+
+        $this->package->setExtra([
+            "phpstorm" => [
+                "exclude_folders" => [
+                    "composer-symlinks" => false
+                ]
+            ],
+            "symlinks" => [
+                "wp-content/plugins" => "wordpress/wp-content/plugins"
+            ]
+        ]);
+        $fileToWrite = getcwd() . '/tests/ExcludeFolders/DisableComposerSymlinks/.idea/valid.iml';
+        $expectedFileOutput = file_get_contents(getcwd()
+                                                . '/tests/ExcludeFolders/DisableComposerSymlinks/expected.iml');
+
+        $this->filesystem->expects($this->never())
+                         ->method('dumpFile');
+
+        ExcludeFolders::update($this->event, $this->filesystem);
+    }
 }

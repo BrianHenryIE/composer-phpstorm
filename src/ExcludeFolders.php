@@ -23,7 +23,11 @@ class ExcludeFolders
             && array_key_exists('exclude_folders', $package->getExtra()['phpstorm'])
             && array_key_exists('folders', $package->getExtra()['phpstorm']['exclude_folders'])
         ) {
-                    $foldersToExclude = $package->getExtra()['phpstorm']['exclude_folders']['folders'];
+            foreach ($package->getExtra()['phpstorm']['exclude_folders']['folders'] as $folderToExclude) {
+                $folderToExclude = ltrim($folderToExclude, '.');
+                $folderToExclude = trim($folderToExclude, '/');
+                $foldersToExclude[] = $folderToExclude;
+            }
         }
         
         $vendorPath = $config->get('vendor-dir');
@@ -92,6 +96,47 @@ class ExcludeFolders
         $content = $root->getElementsByTagName('content')->item(0);
 
 
+        // Check is symlinks installed, exclude any symlinks inside the
+        // project that would cause double entries in PhpStorm.
+
+        $processComposerSymlinks = isset($package->getExtra()['phpstorm']['exclude_folders']['composer-symlinks'])
+            ? $package->getExtra()['phpstorm']['exclude_folders']['composer-symlinks'] : true;
+
+        if ($processComposerSymlinks && array_key_exists('symlinks', $package->getExtra())) {
+            $symlinks = $package->getExtra()['symlinks'];
+
+            foreach ($symlinks as $fileLocation => $symlinkLocation) {
+                // Do not process folders outside the project directory.
+                if (substr($fileLocation, 0, 3) === "../") {
+                    continue;
+                }
+
+                // Sanitize folder path.
+                $fileLocation = ltrim($fileLocation, '.');
+                $fileLocation = trim($fileLocation, '/');
+
+                $symlinkLocation = ltrim($symlinkLocation, '.');
+                $symlinkLocation = trim($symlinkLocation, '/');
+
+                // If the symlink location has already been excluded, don't exclude the files.
+                if (in_array($symlinkLocation, $foldersToExclude)) {
+                    $event->getIO()->write(sprintf(
+                        '<info>Skipping excluding "%s" because symlink "%s" is already excluded.</info>',
+                        $fileLocation,
+                        $symlinkLocation
+                    ));
+                    continue;
+                }
+
+                // If the folder suggested to exclude is a root folder, swap the entries.
+                if (strpos($fileLocation, '/') === false) {
+                    $foldersToExclude[] = $symlinkLocation;
+                } else {
+                    $foldersToExclude[] = $fileLocation;
+                }
+            }
+        }
+
         // Check is Mozart installed, add its entries to $foldersToExclude
 
         if (array_key_exists('mozart', $package->getExtra())) {
@@ -108,27 +153,6 @@ class ExcludeFolders
             }
         }
 
-        // Check is symlinks installed, exclude any symlinks inside the
-        // project that would cause double entries in PhpStorm .
-        if (array_key_exists('symlinks', $package->getExtra())) {
-            $symlinks = $package->getExtra()['symlinks'];
-
-            foreach ($symlinks as $fileLocation => $symlinkLocation) {
-                // Do not process folders outside the project directory.
-                if (substr($fileLocation, 0, 3) !== "../") {
-                    // Sanitize folder path.
-                    $fileLocation = ltrim($fileLocation, '.');
-                    $fileLocation = trim($fileLocation, '/');
-
-                    // If the folder suggested to exclude is a root folder, swap the entries.
-                    if (strpos($fileLocation, '/') === false) {
-                        $foldersToExclude[] = $symlinkLocation;
-                    } else {
-                        $foldersToExclude[] = $fileLocation;
-                    }
-                }
-            }
-        }
 
         foreach ($foldersToExclude as $folderToExclude) {
             // Sanitize folder path.
