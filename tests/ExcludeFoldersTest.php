@@ -328,7 +328,7 @@ class ExcludeFoldersTest extends TestCase
 
         $this->composer->setConfig(new Config(false, __DIR__ . '/ExcludeFolders/MozartWithPackages'));
 
-        $expectedTerminalOutput = '<info>Added "vendor/pimple/pimple" to PhpStorm config at "'
+        $expectedTerminalOutput = '<info>Added "vendor/pimple/pimple/src" to PhpStorm config at "'
             . getcwd() . '/tests/ExcludeFolders/MozartWithPackages/.idea/mozart.iml".</info>';
 
         $this->io
@@ -342,7 +342,7 @@ class ExcludeFoldersTest extends TestCase
             "mozart" => [
                 "dep_namespace" => "CoenJacobs\\TestProject\\Dependencies\\",
                 "dep_directory" => "/src/Dependencies/",
-                "classmap_directory" => "/classes/dependencies/",
+                "classmap_directory" => "/src/dependencies/",
                 "classmap_prefix" => "CJTP_",
                 "packages" => [
                     "pimple/pimple"
@@ -371,7 +371,7 @@ class ExcludeFoldersTest extends TestCase
 
         $this->composer->setConfig(new Config(false, __DIR__ . '/ExcludeFolders/MozartWithoutPackages'));
 
-        $expectedTerminalOutput = '<info>Added "vendor/example/require" to PhpStorm config at "'
+        $expectedTerminalOutput = '<info>Added "vendor/example/require/src" to PhpStorm config at "'
             . getcwd() . '/tests/ExcludeFolders/MozartWithoutPackages/.idea/mozart.iml".</info>';
 
         $this->io
@@ -381,17 +381,17 @@ class ExcludeFoldersTest extends TestCase
                 [$expectedTerminalOutput]
             );
 
+        $this->package->setRequires(["example/require" => "~1.0"]);
+
         // Note 'packages' absent. Other values aren't relevant.
         $this->package->setExtra([
             "mozart" => [
                 "dep_namespace" => "CoenJacobs\\TestProject\\Dependencies\\",
                 "dep_directory" => "/src/Dependencies/",
-                "classmap_directory" => "/classes/dependencies/",
+                "classmap_directory" => "/src/dependencies/",
                 "classmap_prefix" => "CJTP_"
             ]
         ]);
-
-        $this->package->setRequires(["example/require" => "~1.0"]);
 
         $fileToWrite = getcwd() . '/tests/ExcludeFolders/MozartWithoutPackages/.idea/mozart.iml';
         $expectedFileOutput = file_get_contents(getcwd() . '/tests/ExcludeFolders/MozartWithoutPackages/expected.iml');

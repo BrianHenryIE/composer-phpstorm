@@ -164,11 +164,17 @@ class ExcludeFolders
 
             if (isset($mozart['packages']) && is_array($mozart['packages'])) {
                 foreach ($mozart['packages'] as $mozartPackage) {
-                    $foldersToExclude[] = "vendor/$mozartPackage";
+                    if (!in_array("vendor/$mozartPackage", $foldersToInclude)) {
+                        $foldersToExclude[] = "vendor/$mozartPackage/src"; // TODO: This assumes src.
+                        $foldersToInclude[] = "vendor/$mozartPackage";
+                    }
                 }
             } else {
                 foreach ($package->getRequires() as $packageRequires => $version) {
-                    $foldersToExclude[] = "vendor/$packageRequires" ;
+                    if (!in_array("vendor/$packageRequires", $foldersToInclude)) {
+                        $foldersToExclude[] = "vendor/$packageRequires/src";
+                        $foldersToInclude[] = "vendor/$packageRequires";
+                    }
                 }
             }
         }
