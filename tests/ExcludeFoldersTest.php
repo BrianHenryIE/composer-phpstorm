@@ -463,4 +463,41 @@ class ExcludeFoldersTest extends TestCase
 
         ExcludeFolders::update($this->event, $this->filesystem);
     }
+
+    /**
+     * When a folder is autodetected as a symlink destination, don't exclude it if it is in the root of the project.
+     * Instead, exclude the symlink.
+     */
+    public function testRootFolderInclude()
+    {
+
+        $this->composer->setConfig(new Config(false, __DIR__ . '/ExcludeFolders/RootFolderInclude'));
+
+        $expectedTerminalOutput = '<info>Added "subdir/project-name" to PhpStorm config at "'
+                                  . getcwd() . '/tests/ExcludeFolders/RootFolderInclude/.idea/valid.iml".</info>';
+
+        $this->io
+            ->expects($this->exactly(1))
+            ->method('write')
+            ->withConsecutive(
+                [$expectedTerminalOutput]
+            );
+
+        // Create a symlink to the src directory inside a subdir.
+        // e.g. in WordPress development, create inside wp-content/plugins.
+        $this->package->setExtra([
+            "symlinks" => [
+                "src" => "subdir/project-name"
+            ]
+        ]);
+
+        $fileToWrite = getcwd() . '/tests/ExcludeFolders/RootFolderInclude/.idea/valid.iml';
+        $expectedFileOutput = file_get_contents(getcwd() . '/tests/ExcludeFolders/RootFolderInclude/expected.iml');
+
+        $this->filesystem->expects($this->once())
+                         ->method('dumpFile')
+                         ->with($fileToWrite, $expectedFileOutput);
+
+        ExcludeFolders::update($this->event, $this->filesystem);
+    }
 }

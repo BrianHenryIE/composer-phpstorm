@@ -113,10 +113,19 @@ class ExcludeFolders
         if (array_key_exists('symlinks', $package->getExtra())) {
             $symlinks = $package->getExtra()['symlinks'];
 
-            foreach ($symlinks as $original => $symlink) {
+            foreach ($symlinks as $fileLocation => $symlinkLocation) {
                 // Do not process folders outside the project directory.
-                if (substr($original, 0, 3) !== "../") {
-                    $foldersToExclude[] = $original;
+                if (substr($fileLocation, 0, 3) !== "../") {
+                    // Sanitize folder path.
+                    $fileLocation = ltrim($fileLocation, '.');
+                    $fileLocation = trim($fileLocation, '/');
+
+                    // If the folder suggested to exclude is a root folder, swap the entries.
+                    if (strpos($fileLocation, '/') === false) {
+                        $foldersToExclude[] = $symlinkLocation;
+                    } else {
+                        $foldersToExclude[] = $fileLocation;
+                    }
                 }
             }
         }
