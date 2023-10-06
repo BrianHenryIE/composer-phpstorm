@@ -8,11 +8,11 @@
         { "name": "Brian Henry", "email": "BrianHenryIE@gmail.com" }
     ],
     "require": {
-        "symfony/filesystem": "^2.5 || ^3.0"
+        "symfony/filesystem": "*"
     },
     "require-dev": {
-        "composer/composer": "^1.0@dev",
-        "phpunit/phpunit": "^8",
+        "composer/composer": "*",
+        "phpunit/phpunit": "*",
         "squizlabs/php_codesniffer": "*"
     },
     "autoload": {
