@@ -9,7 +9,7 @@ use Symfony\Component\Filesystem\Filesystem;
 
 class ExcludeFolders
 {
-    public static function update(Event $event, Filesystem $filesystem = null)
+    public static function update(Event $event, ?Filesystem $filesystem = null)
     {
 
         /** @var PackageInterface $package */
@@ -48,7 +48,7 @@ class ExcludeFolders
 
         $vendorPath = $config->get('vendor-dir');
         $rootPath = dirname($vendorPath);
-        $filesystem = $filesystem ?: new Filesystem();
+        $filesystem = $filesystem ?? new Filesystem();
 
         // Find .iml file in .idea folder
         $phpStormProjectFolder = $rootPath . '/.idea/';
