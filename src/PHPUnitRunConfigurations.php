@@ -35,94 +35,33 @@ use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use Symfony\Component\Filesystem\Filesystem;
 
-class PHPUnitRunConfigurations
+class PHPUnitRunConfigurations extends PhpStorm
 {
     public static function update(Event $event, Filesystem $filesystem = null)
     {
-
-        /** @var PackageInterface $package */
-        $package = $event->getComposer()->getPackage();
-        /** @var Config $config */
-        $config = $event->getComposer()->getConfig();
-
-
-        $vendorPath = $config->get('vendor-dir');
-        $rootPath = dirname($vendorPath);
         $filesystem = $filesystem ?: new Filesystem();
 
-
-        // Find workspace.xml file in .idea folder
-        $phpStormProjectFolder = $rootPath . '/.idea/';
-
-        if (!file_exists($phpStormProjectFolder)) {
-            $event->getIO()->write(sprintf(
-                '<info>PhpStorm project folder "%s" does not exist. '
-                . 'Maybe this project has not been opened in PhpStorm yet.</info>',
-                $phpStormProjectFolder
-            ));
+        try {
+            $dom = self::getWorkspaceDom($event, $filesystem);
+        } catch (\Exception $e) {
+            $event->getIO()->write($e->getMessage());
             return;
         }
 
-        $phpStormWorkspaceXml = $phpStormProjectFolder . 'workspace.xml';
-
-        if (!file_exists($phpStormWorkspaceXml)) {
-            $event->getIO()->write(sprintf(
-                '<info>No PhpStorm workspace.xml file found in "%s".</info>',
-                $phpStormProjectFolder
-            ));
-            return;
-        }
-
-        $dom = new \DOMDocument();
         $domWasModified = false;
-
-        $dom->preserveWhiteSpace = false;
-        $dom->formatOutput = true;
-
-        $fileIsValid = @$dom->load($phpStormWorkspaceXml);
-
-        if (!$fileIsValid) {
-            $event->getIO()->write(sprintf(
-                '<info>Could not parse XML for PhpStorm workspace.xml file at "%s".</info>',
-                $phpStormProjectFolder
-            ));
-            return;
-        }
 
         /** @var \DOMElement $root */
         $project = $dom->documentElement;
 
         $discoveredPhpUnitFiles = array();
 
-        foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator($rootPath)) as $file) {
+        foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator(self::$rootPath)) as $file) {
             if ($file->getFilename() === 'phpunit.xml') {
                 $discoveredPhpUnitFiles[] = $file->getPath() . '/' . $file->getFilename();
             }
         }
 
-
-        // Find the <component name="RunManager" > node and create if absent
-        $runManagerNode = null;
-        foreach ($project->childNodes as $node) {
-
-            /** @var \DOMNode $node */
-
-            if ($node->nodeName == 'component' && $node->getAttribute('name') === "RunManager") {
-                $runManagerNode = $node;
-                break;
-            }
-        }
-        if (is_null($runManagerNode)) {
-            $newNode = new \DOMElement('component');
-
-            $project->appendChild($newNode);
-
-            // Can only setAttribute after adding to the document.
-            $newNode->setAttribute('name', "RunManager");
-
-            $runManagerNode = $newNode;
-        }
-
+        $runManagerNode = self::findOrCreateComponentNodeNamed('RunManager', $project);
 
         // Remove any Run Configurations for missing phpunit.xml files.
         foreach ($runManagerNode->childNodes as $configurationNode) {
@@ -130,7 +69,7 @@ class PHPUnitRunConfigurations
                 // Then this is a TestRunner node
                 if ($grandchildNode->hasAttribute('configuration_file')) {
                     $nodePhpUnitFileProjectDir = $grandchildNode->getAttribute('configuration_file');
-                    $nodePhpUnitFileFilesystem = str_replace('$PROJECT_DIR$', $rootPath, $nodePhpUnitFileProjectDir);
+                    $nodePhpUnitFileFilesystem = str_replace('$PROJECT_DIR$', self::$rootPath, $nodePhpUnitFileProjectDir);
                     if (!file_exists($nodePhpUnitFileFilesystem)) {
                         $nodeName = $configurationNode->getAttribute('name');
 
@@ -141,7 +80,7 @@ class PHPUnitRunConfigurations
                             '<info>Removed PHPUnit Run Configuration "%s" at `%s` from "%s".</info>',
                             $nodeName,
                             $nodePhpUnitFileProjectDir,
-                            $phpStormWorkspaceXml
+                            self::$phpStormWorkspaceXml
                         ));
                     }
                 }
@@ -151,7 +90,7 @@ class PHPUnitRunConfigurations
         foreach ($discoveredPhpUnitFiles as $phpUnitFile) {
             // Replace the full path with the project relative path.
 
-            $phpUnitFile = str_replace($rootPath, '$PROJECT_DIR$', $phpUnitFile);
+            $phpUnitFile = str_replace(self::$rootPath, '$PROJECT_DIR$', $phpUnitFile);
             $phpUnitFileRegistered = false;
 
             // Ignore vendor subfolder.
@@ -195,7 +134,7 @@ class PHPUnitRunConfigurations
                     '<info>PhpStorm PHPUnit Run Configuration "%s" for "%s" already present in "%s".</info>',
                     $configurationName,
                     str_replace('$PROJECT_DIR$', '', $phpUnitFile),
-                    $phpStormWorkspaceXml
+                    self::$phpStormWorkspaceXml
                 ));
             } else {
                 $newConfigurationNode = new \DOMElement('configuration');
@@ -223,7 +162,7 @@ class PHPUnitRunConfigurations
                     '<info>Added PHPStorm Run Configuration "%s" for `%s` to "%s".</info>',
                     $configurationName,
                     str_replace('$PROJECT_DIR$', '', $phpUnitFile),
-                    $phpStormWorkspaceXml
+                    self::$phpStormWorkspaceXml
                 ));
             }
         }
@@ -234,7 +173,8 @@ class PHPUnitRunConfigurations
                 $project->removeChild($runManagerNode);
             }
 
-            $filesystem->dumpFile($phpStormWorkspaceXml, $dom->saveXML());
+            $filesystem->dumpFile(self::$phpStormWorkspaceXml, $dom->saveXML());
         }
     }
+
 }
