@@ -69,7 +69,11 @@ class PHPUnitRunConfigurations extends PhpStorm
                 // Then this is a TestRunner node
                 if ($grandchildNode->hasAttribute('configuration_file')) {
                     $nodePhpUnitFileProjectDir = $grandchildNode->getAttribute('configuration_file');
-                    $nodePhpUnitFileFilesystem = str_replace('$PROJECT_DIR$', self::$rootPath, $nodePhpUnitFileProjectDir);
+                    $nodePhpUnitFileFilesystem = str_replace(
+                        '$PROJECT_DIR$',
+                        self::$rootPath,
+                        $nodePhpUnitFileProjectDir
+                    );
                     if (!file_exists($nodePhpUnitFileFilesystem)) {
                         $nodeName = $configurationNode->getAttribute('name');
 
@@ -176,5 +180,4 @@ class PHPUnitRunConfigurations extends PhpStorm
             $filesystem->dumpFile(self::$phpStormWorkspaceXml, $dom->saveXML());
         }
     }
-
 }

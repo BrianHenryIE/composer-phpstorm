@@ -616,5 +616,4 @@ class ExcludeFoldersTest extends TestCase
 
         ExcludeFolders::update($this->event, $this->filesystem);
     }
-
 }

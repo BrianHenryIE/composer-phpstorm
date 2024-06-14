@@ -74,7 +74,7 @@ class WordPress extends PhpStorm
 
         $event->getIO()->debug('Saved to ' . self::$phpStormWorkspaceXml);
 
-        $event->getIO()->debug( $dom->saveXML());
+        $event->getIO()->debug($dom->saveXML());
     }
 
     protected static function findWordPress(Event $event): ?string
@@ -91,7 +91,11 @@ class WordPress extends PhpStorm
         ];
 
         if (isset($package->getExtra()['wordpress-install-dir'])) {
-            foreach (array_reverse((array) $package->getExtra()['wordpress-install-dir']) as $johnpblochWordPressCoreInstaller) {
+            foreach (
+                array_reverse(
+                    (array) $package->getExtra()['wordpress-install-dir']
+                ) as $johnpblochWordPressCoreInstaller
+            ) {
                 array_unshift($locations, $johnpblochWordPressCoreInstaller);
             }
         }
