@@ -1,40 +1,42 @@
-[![PHPUnit ](https://img.shields.io/badge/PHPUnit-96%25%20coverage-28a745.svg)]() [![PHPCS PSR12](https://img.shields.io/badge/PHPCS-PSR%2012-f09f47.svg)](https://www.php-fig.org/psr/psr-12/)
+[![PHPCS PSR12](https://img.shields.io/badge/PHPCS-PSR%2012-f09f47.svg)](https://www.php-fig.org/psr/psr-12/)
 
 # Composer-PhpStorm
 
-Auto-creates PhpStorm Run Configurations for PHP Unit and marks folders as excluded.
+Auto-creates PhpStorm Run Configurations for PHP Unit, marks folders as excluded, and configures WordPress integration.
 
-*Tested with PhpStorm 2019.3*
+*Tested from PhpStorm 2019.3 to 2024.1.2*
 
 ## Overview
 
 * **ExcludeFolders** marks specified folders, symlinked folders and [Mozart](https://github.com/coenjacobs/mozart) managed packages as excluded from PhpStorm code navigation and completion, by adding entries to the project's `.iml` configuration file
 * **PHPUnitRunConfigurations** creates a [Run Configuration](https://www.jetbrains.com/help/phpstorm/creating-run-debug-configuration-for-tests.html) for every `phpunit.xml` found in the project (ignoring `/vendor` and `/wp-content`), by adding entries to `workspace.xml`
+* **WordPress** searches for a WordPress install and enables WordPress support.
 
 ## Installation
 
-While still a new project, this is not yet available through Packagist. In `composer.json`:
+This is not yet available through Packagist.
 
 ```
-"repositories": [
- {
-  "url": "https://github.com/BrianHenryIE/composer-phpstorm",
-  "type": "git"
- }
-],
+composer config minimum-stability dev
+composer config prefer-stable true
 
-"require-dev": {
- "brianhenryie/composer-phpstorm": "dev-master"
-}
+composer config repositories..brianhenryie/composer-phpstorm git https://github.com/.brianhenryie/composer-phpstorm
+composer require --dev brianhenryie/composer-phpstorm
+```
 
+Add to `composer.json`:
+
+```
 "scripts": {
  "post-install-cmd": [
   "BrianHenryIE\\ComposerPhpStorm\\ExcludeFolders::update",
-  "BrianHenryIE\\ComposerPhpStorm\\PHPUnitRunConfigurations::update"
+  "BrianHenryIE\\ComposerPhpStorm\\PHPUnitRunConfigurations::update",
+  "BrianHenryIE\\ComposerPhpStorm\\WordPress::update"
  ],
  "post-update-cmd": [
   "BrianHenryIE\\ComposerPhpStorm\\ExcludeFolders::update",
-  "BrianHenryIE\\ComposerPhpStorm\\PHPUnitRunConfigurations::update"
+  "BrianHenryIE\\ComposerPhpStorm\\PHPUnitRunConfigurations::update",
+  "BrianHenryIE\\ComposerPhpStorm\\WordPress::update"
  ]
 },
 ```
@@ -96,15 +98,21 @@ WordPress. [I write many small plugins](https://github.com/BrianHenryIE/WordPres
 
 ## TODO
 
-* Symlinks could searched for, then checked if they were pointing inside the project directory, rather than reading from composer.json
+* Symlinks could be searched for, then checked if they were pointing inside the project directory, rather than reading from composer.json
 * Set Default Interpreter (PHP Language Level/CLI Interpreter)
 * Configuration to allow excluding autodiscovered `phpunit.xml`s
 * Should find subpackages of those processed by Mozart 
 * Set PHP language level
-* Set PHPCS, CBF, WordPress path
+* Set PHPCS, CBF, ~~WordPress path~~
 * Allow disabling Mozart integration
 * Automatically handle `vendor-name/project` folders in exclusion list but including that folder and excluding their `src` folder.
 * Should be one script and conditionally run parts based on config.
+* Consider [geecu/phpstorm-configurator](https://github.com/geecu/phpstorm-configurator/)
+
+## See Also
+
+* [BrianHenryIE/composer-fallback-to-git](https://github.com/BrianHenryIE/composer-fallback-to-git)
+* [BrianHenryIE/composer-prefer-local](https://github.com/BrianHenryIE/composer-prefer-local)
 
 ## Acknowledgements
 
