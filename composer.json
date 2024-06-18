@@ -4,14 +4,19 @@
     "keywords": ["composer", "phpstorm", "excludefolder"],
     "homepage": "https://github.com/BrianHenryIE/composer-phpstorm",
     "license": "MIT",
+    "type": "composer-plugin",
+    "extra": {
+        "class": "\\BrianHenryIE\\ComposerPhpStorm\\ComposerPhpStorm"
+    },
     "authors": [
         { "name": "Brian Henry", "email": "BrianHenryIE@gmail.com" }
     ],
     "require": {
+        "composer-plugin-api": "^2.0",
         "symfony/filesystem": "*"
     },
     "require-dev": {
-        "composer/composer": "*",
+        "composer/composer": "^2.0",
         "phpunit/phpunit": "*",
         "squizlabs/php_codesniffer": "*"
     },

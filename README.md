@@ -14,31 +14,10 @@ Auto-creates PhpStorm Run Configurations for PHP Unit, marks folders as excluded
 
 ## Installation
 
-This is not yet available through Packagist.
 
 ```
-composer config minimum-stability dev
-composer config prefer-stable true
-
-composer config repositories..brianhenryie/composer-phpstorm git https://github.com/.brianhenryie/composer-phpstorm
+composer config allow-plugins.brianhenryie/composer-phpstorm true
 composer require --dev brianhenryie/composer-phpstorm
-```
-
-Add to `composer.json`:
-
-```
-"scripts": {
- "post-install-cmd": [
-  "BrianHenryIE\\ComposerPhpStorm\\ExcludeFolders::update",
-  "BrianHenryIE\\ComposerPhpStorm\\PHPUnitRunConfigurations::update",
-  "BrianHenryIE\\ComposerPhpStorm\\WordPress::update"
- ],
- "post-update-cmd": [
-  "BrianHenryIE\\ComposerPhpStorm\\ExcludeFolders::update",
-  "BrianHenryIE\\ComposerPhpStorm\\PHPUnitRunConfigurations::update",
-  "BrianHenryIE\\ComposerPhpStorm\\WordPress::update"
- ]
-},
 ```
 
 Optionally:
@@ -54,7 +33,7 @@ Optionally:
    "include_folders": [
   		"path/to/folder_one/from/project/base",
    ],
-   'composer-symlinks': false
+   "composer-symlinks": false
   }
  }
 }
